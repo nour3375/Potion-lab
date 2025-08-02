@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>معمل الجرعات السحرية</title>
+<title>⚗️ معمل الجرعات السحرية</title>
 <style>
     body {
         background-color: #1c1c1c;
@@ -10,27 +10,26 @@
         font-family: Arial, sans-serif;
         text-align: center;
     }
-    h1 {
-        margin-top: 20px;
-    }
+    h1 { margin-top: 20px; }
     #lab {
         display: flex;
         justify-content: center;
         margin-top: 20px;
+        gap: 50px;
     }
     .shelf {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        margin-right: 50px;
     }
     .ingredient {
         width: 80px;
         height: 80px;
-        background-color: #444;
         border-radius: 10px;
         cursor: grab;
         border: 2px solid #ccc;
+        background-size: cover;
+        background-position: center;
     }
     #cauldron {
         width: 300px;
@@ -40,6 +39,7 @@
         position: relative;
         overflow: hidden;
         border: 4px solid #777;
+        transition: background-color 0.5s ease;
     }
     #drop-zone {
         width: 100%;
@@ -71,10 +71,14 @@
 
 <div id="status"></div>
 
+<audio id="success-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+<audio id="fail-sound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+
 <script>
     const potions = [
         { name: "جرعة القوة", ingredients: ["عشب التنين", "دم العنقاء"] },
-        { name: "جرعة النوم", ingredients: ["أشواك القنفذ", "عشب التنين"] }
+        { name: "جرعة النوم", ingredients: ["أشواك القنفذ", "عشب التنين"] },
+        { name: "جرعة الشفاء", ingredients: ["دم العنقاء", "أشواك القنفذ"] }
     ];
 
     let currentPotion = potions[Math.floor(Math.random() * potions.length)];
@@ -84,6 +88,7 @@
 
     const ingredients = document.querySelectorAll(".ingredient");
     const dropZone = document.getElementById("drop-zone");
+    const cauldron = document.getElementById("cauldron");
 
     ingredients.forEach(ingredient => {
         ingredient.addEventListener("dragstart", e => {
@@ -91,22 +96,26 @@
         });
     });
 
-    dropZone.addEventListener("dragover", e => {
-        e.preventDefault();
-    });
+    dropZone.addEventListener("dragover", e => e.preventDefault());
 
     dropZone.addEventListener("drop", e => {
         e.preventDefault();
         const ingredientName = e.dataTransfer.getData("text");
         chosenIngredients.push(ingredientName);
+        
+        // تغيير لون الإناء عند إضافة مكون
+        cauldron.style.backgroundColor = "purple";
+        setTimeout(() => cauldron.style.backgroundColor = "#333", 500);
 
         if (chosenIngredients.length === currentPotion.ingredients.length) {
             if (JSON.stringify(chosenIngredients) === JSON.stringify(currentPotion.ingredients)) {
                 document.getElementById("status").textContent = "✨ الجرعة نجحت!";
                 document.getElementById("status").style.color = "lightgreen";
+                document.getElementById("success-sound").play();
             } else {
                 document.getElementById("status").textContent = "💥 فشلت الجرعة!";
                 document.getElementById("status").style.color = "red";
+                document.getElementById("fail-sound").play();
             }
         }
     });
